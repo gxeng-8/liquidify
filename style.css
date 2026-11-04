@@ -447,3 +447,6 @@ li.swipe {
 }
 .soft:active { background: #BFE0EE; transform: scale(.98); }
 .soft:focus-visible { outline: 3px solid var(--teal); outline-offset: 2px; }
+
+/* backup */
+#exportBtn { margin-top: 12px; }
