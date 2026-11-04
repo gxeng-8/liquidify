@@ -10,7 +10,7 @@
   <title>Money Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=5">
   <link rel="apple-touch-icon" href="icon.png">
 </head>
 <body>
@@ -64,8 +64,9 @@
         <h2>Backup</h2>
         <p class="note">Save a copy of all your expenses. Do this once in a while.</p>
         <button class="primary" id="exportBtn">Export backup</button>
+        <button class="soft" id="importBtn">Import backup</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
         <p id="backupMsg" class="note" role="status"></p>
-        <p class="note" id="ver"></p>
     </div>
     </section>
 
@@ -131,6 +132,6 @@
   </div>
 </div>
 
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

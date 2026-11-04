@@ -456,20 +456,59 @@ async function exportBackup() {
   }
 }
 
-  // laptop: normal download
-  const url = URL.createObjectURL(file);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-  msg.textContent = `Saved ${load().length} entries as ${name}.`;
-
-
 document.getElementById('exportBtn').addEventListener('click', exportBackup);
-document.getElementById('ver').textContent = 'App version 3';
+
+/* import */
+function validEntry(e) {
+  return e
+    && typeof e.id === 'number'
+    && typeof e.item === 'string' && e.item.trim()
+    && typeof e.amount === 'number' && isFinite(e.amount) && e.amount > 0
+    && typeof e.category === 'string' && e.category.trim()
+    && typeof e.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.date);
+}
+
+async function importBackup(file) {
+  const msg = document.getElementById('backupMsg');
+  try {
+    const data = JSON.parse(await file.text());
+    const incoming = Array.isArray(data) ? data : data.expenses;
+    if (!Array.isArray(incoming)) throw new Error('This is not a Liquidify backup.');
+
+    const good = incoming.filter(validEntry);
+    const list = load();
+    const have = new Set(list.map(e => e.id));
+
+    let added = 0;
+    good.forEach(e => {
+      if (!have.has(e.id)) {
+        list.push({ id: e.id, item: e.item.trim(), amount: e.amount,
+                    category: e.category.trim(), date: e.date });
+        have.add(e.id);
+        added++;
+      }
+    });
+
+    save(list);
+    render();
+
+    const skipped = good.length - added;
+    const bad = incoming.length - good.length;
+    msg.textContent = `Added ${added} new. ${skipped} already there` +
+      (bad ? `, ${bad} skipped (not valid).` : '.');
+  } catch (err) {
+    msg.textContent = 'Could not import: ' + err.message;
+  }
+}
+
+document.getElementById('importBtn').addEventListener('click', () => {
+  document.getElementById('importFile').click();
+});
+document.getElementById('importFile').addEventListener('change', ev => {
+  const f = ev.target.files[0];
+  if (f) importBackup(f);
+  ev.target.value = ''; // so you can pick the same file again
+});
 
 /* tabs */
 document.querySelectorAll('.tab').forEach(btn => {
