@@ -419,29 +419,42 @@ document.addEventListener('keydown', ev => {
   if (ev.key === 'Escape' && picker.classList.contains('open')) closePicker();
 });
 
-/* backup */
 async function exportBackup() {
   const msg = document.getElementById('backupMsg');
-  msg.textContent = 'Preparing backup...';
-  const data = JSON.stringify({
-    app: 'liquidify',
-    version: 1,
-    exportedAt: new Date().toISOString(),
-    expenses: load()
-  }, null, 2);
-  const name = `liquidify-backup-${dateKey()}.json`;
-  const file = new File([data], name, { type: 'application/json' });
+  msg.textContent = 'Preparing your backup...';
 
-  // iPhone: open the share sheet so you can save to Files
   try {
+    const data = JSON.stringify({
+      app: 'liquidify',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      expenses: load()
+    }, null, 2);
+    const name = `liquidify-backup-${dateKey()}.json`;
+    const file = new File([data], name, { type: 'application/json' });
+
+    // iPhone: open the share sheet so you can save to Files
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: 'Liquidify backup' });
       msg.textContent = 'Backup ready. Make sure you saved it to Files.';
       return;
     }
+
+    // laptop: normal download
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    msg.textContent = `Saved ${load().length} entries as ${name}.`;
   } catch (err) {
-    if (err.name === 'AbortError') return; // you closed the share sheet
+    if (err.name === 'AbortError') { msg.textContent = 'Cancelled.'; return; }
+    msg.textContent = 'Error: ' + err.name + ' - ' + err.message;
   }
+}
 
   // laptop: normal download
   const url = URL.createObjectURL(file);
@@ -453,9 +466,10 @@ async function exportBackup() {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
   msg.textContent = `Saved ${load().length} entries as ${name}.`;
-}
+
 
 document.getElementById('exportBtn').addEventListener('click', exportBackup);
+document.getElementById('ver').textContent = 'App version 3';
 
 /* tabs */
 document.querySelectorAll('.tab').forEach(btn => {
