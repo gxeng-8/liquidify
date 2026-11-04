@@ -452,3 +452,22 @@ li.swipe {
 #exportBtn { margin-top: 12px; }
 
 #importBtn { margin-top: 10px; }
+
+/* amount input: no outline or inner border */
+.amount-row input {
+  outline: none;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  -moz-appearance: textfield;
+}
+.amount-row input::-webkit-outer-spin-button,
+.amount-row input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* soft highlight on the whole card instead */
+.hero:focus-within { box-shadow: 0 0 0 3px #A9D8E8; }
