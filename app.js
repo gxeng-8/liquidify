@@ -422,6 +422,7 @@ document.addEventListener('keydown', ev => {
 /* backup */
 async function exportBackup() {
   const msg = document.getElementById('backupMsg');
+  msg.textContent = 'Preparing backup...';
   const data = JSON.stringify({
     app: 'liquidify',
     version: 1,
