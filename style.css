@@ -1,0 +1,185 @@
+:root {
+  --bg: #F1F8FA;
+  --sky: #D6ECF6;
+  --teal: #167A88;
+  --navy: #12324A;
+  --muted: #4F6B7A;
+  --line: #DCEBF0;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body { margin: 0; height: 100%; }
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--navy);
+}
+
+#app { max-width: 480px; margin: 0 auto; min-height: 100%; }
+
+.screen {
+  display: none;
+  padding: calc(20px + env(safe-area-inset-top)) 20px 150px;
+}
+.screen.active { display: block; }
+
+h1 { font-size: 26px; font-weight: 800; margin: 0 0 16px; }
+h2 { font-size: 17px; font-weight: 800; margin: 18px 0 4px; }
+.empty { color: var(--muted); font-size: 14px; }
+
+/* hero card */
+.hero {
+  background: var(--sky);
+  border-radius: 28px;
+  padding: 20px;
+  margin-bottom: 14px;
+}
+.hero-label { font-size: 12px; font-weight: 600; color: var(--muted); display: block; }
+.hero-total { font-size: 40px; font-weight: 800; }
+
+/* list */
+ul { list-style: none; margin: 0; padding: 0; }
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 52px;
+  border-bottom: 1px solid var(--line);
+}
+.name { font-size: 15px; font-weight: 700; }
+.cat { font-size: 12px; color: var(--muted); }
+.price { font-weight: 700; }
+
+/* bottom tab bar */
+nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+}
+.tab {
+  border: 0;
+  background: none;
+  width: 76px;
+  height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+}
+.tab.active { color: var(--teal); font-weight: 700; }
+
+/* floating + button */
+.fab {
+  position: absolute;
+  right: 20px;
+  top: -72px;
+  width: 56px;
+  height: 56px;
+  border-radius: 28px;
+  border: 0;
+  background: var(--teal);
+  color: #fff;
+  font-size: 32px;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(22, 122, 136, .35);
+}
+
+/* slide-up sheet */
+.sheet {
+  position: fixed;
+  inset: 0;
+  visibility: hidden;
+  transition: visibility 0s .25s;
+}
+.sheet.open { visibility: visible; transition-delay: 0s; }
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(18, 50, 74, .4);
+  opacity: 0;
+  transition: opacity .25s;
+}
+.sheet.open .backdrop { opacity: 1; }
+
+.panel {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border-radius: 28px 28px 0 0;
+  padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+  transform: translate(-50%, 100%);
+  transition: transform .25s;
+}
+.sheet.open .panel { transform: translate(-50%, 0); }
+.panel h2 { margin-top: 0; margin-bottom: 12px; }
+
+label { font-size: 13px; font-weight: 700; display: block; margin: 0 0 6px; }
+.hero label { font-size: 12px; font-weight: 600; }
+
+.amount-row { display: flex; align-items: center; gap: 6px; }
+.amount-row span { font-size: 34px; font-weight: 800; }
+.amount-row input {
+  border: 0;
+  background: none;
+  font-size: 44px;
+  font-weight: 800;
+  width: 100%;
+  padding: 0;
+  color: var(--navy);
+  font-family: inherit;
+}
+
+.panel > input {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #CFE3EA;
+  border-radius: 14px;
+  padding: 0 16px;
+  font-size: 16px; /* 16px stops iPhone from zooming in */
+  margin-bottom: 14px;
+  font-family: inherit;
+  color: var(--navy);
+  background: #fff;
+}
+
+.primary {
+  width: 100%;
+  height: 54px;
+  border: 0;
+  border-radius: 27px;
+  background: var(--teal);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: inherit;
+}
+.ghost {
+  width: 100%;
+  height: 44px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  margin-top: 6px;
+}

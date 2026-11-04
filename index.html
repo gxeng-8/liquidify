@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#F1F8FA">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Money Tracker">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Money Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <section id="today" class="screen active">
+      <h1 id="listDate"></h1>
+      <div class="hero">
+        <div class="hero-label">Spent today</div>
+        <div id="dayTotal" class="hero-total">₱0</div>
+      </div>
+      <h2>Entries</h2>
+      <ul id="list"></ul>
+    </section>
+
+    <section id="stats" class="screen">
+      <h1>Stats</h1>
+      <p class="empty">Coming in the next step.</p>
+    </section>
+
+    <section id="categories" class="screen">
+      <h1>Categories</h1>
+      <p class="empty">Coming soon.</p>
+    </section>
+
+    <section id="you" class="screen">
+      <h1>You</h1>
+      <p class="empty">Coming soon.</p>
+    </section>
+
+  </div>
+
+  <nav>
+    <button class="fab" id="addBtn" aria-label="Add expense">+</button>
+    <button class="tab active" data-screen="today">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-8 9 8v10H3z"/></svg>Today
+    </button>
+    <button class="tab" data-screen="stats">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Stats
+    </button>
+    <button class="tab" data-screen="categories">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Categories
+    </button>
+    <button class="tab" data-screen="you">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>You
+    </button>
+  </nav>
+
+  <div id="sheet" class="sheet">
+    <div class="backdrop" id="backdrop"></div>
+    <div class="panel">
+      <h2>New expense</h2>
+      <div class="hero">
+        <label for="amount" class="hero-label">Amount</label>
+        <div class="amount-row">
+          <span>₱</span>
+          <input id="amount" type="number" inputmode="decimal" placeholder="0">
+        </div>
+      </div>
+      <label for="item">What was it for?</label>
+      <input id="item" type="text" placeholder="e.g. Lunch">
+      <label for="category">Category</label>
+      <input id="category" type="text" placeholder="e.g. Food">
+      <button class="primary" id="saveBtn">Save expense</button>
+      <button class="ghost" id="cancelBtn">Cancel</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
