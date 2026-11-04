@@ -195,6 +195,7 @@ function addSwipe(li, slide, entry) {
 }
 
 function render() {
+  renderStats();
   const items = load().filter(e => e.date === dateKey());
 
   document.getElementById('listDate').textContent =
@@ -256,6 +257,167 @@ function render() {
     ul.appendChild(li);
   });
 }
+
+/* stats */
+let statsMonth = new Date();
+statsMonth.setDate(1);
+
+const COLORS = ['#167A88', '#4DA3D9', '#7FD1C7', '#FFD98A', '#A9D8E8', '#12324A'];
+
+function monthKey(d) { return dateKey(d).slice(0, 7); }
+function monthName(d, long) {
+  return d.toLocaleDateString('en-PH', { month: long ? 'long' : 'short' });
+}
+
+function renderStats() {
+  const now = new Date();
+  const key = monthKey(statsMonth);
+  const isCurrent = key === monthKey(now);
+
+  document.getElementById('monthLabel').textContent =
+    statsMonth.toLocaleDateString('en-PH', { month: 'long', year: 'numeric' });
+  document.getElementById('nextMonth').disabled = isCurrent;
+
+  const entries = load().filter(e => e.date.startsWith(key));
+  const total = entries.reduce((s, e) => s + e.amount, 0);
+
+  const daysInMonth = new Date(statsMonth.getFullYear(), statsMonth.getMonth() + 1, 0).getDate();
+  const days = isCurrent ? now.getDate() : daysInMonth;
+
+  document.getElementById('totalVal').textContent = peso(total);
+  document.getElementById('avgVal').textContent = peso(Math.round(total / days));
+
+  // compare with last month (same number of days if this month isn't over yet)
+  const prev = new Date(statsMonth.getFullYear(), statsMonth.getMonth() - 1, 1);
+  const prevKey = monthKey(prev);
+  const prevTotal = load()
+    .filter(e => e.date.startsWith(prevKey) && (!isCurrent || parseInt(e.date.slice(8), 10) <= days))
+    .reduce((s, e) => s + e.amount, 0);
+
+  const badge = document.getElementById('pctBadge');
+  const note = document.getElementById('compareNote');
+  badge.className = 'badge';
+
+  if (prevTotal === 0) {
+    badge.textContent = 'No data in ' + monthName(prev);
+    note.textContent = '';
+  } else {
+    const pct = Math.round(((total - prevTotal) / prevTotal) * 100);
+    const sign = pct < 0 ? '−' : pct > 0 ? '+' : '';
+    badge.textContent = `${sign}${Math.abs(pct)}% vs ${monthName(prev)}`;
+    if (pct < 0) badge.classList.add('down');
+    if (pct > 0) badge.classList.add('up');
+    note.textContent = isCurrent
+      ? `Compared with the first ${days} days of ${monthName(prev, true)}.`
+      : '';
+  }
+
+  // by category
+  const sums = {};
+  entries.forEach(e => { sums[e.category] = (sums[e.category] || 0) + e.amount; });
+  const rows = Object.entries(sums).sort((a, b) => b[1] - a[1]);
+
+  const box = document.getElementById('catList');
+  box.innerHTML = '';
+
+  if (!rows.length) {
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = 'No expenses this month.';
+    box.appendChild(p);
+    return;
+  }
+
+  rows.forEach(([name, sum], i) => {
+    const pc = Math.round((sum / total) * 100);
+
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+
+    const top = document.createElement('div');
+    top.className = 'cat-top';
+    const n = document.createElement('span');
+    n.textContent = name;
+    const a = document.createElement('span');
+    a.textContent = peso(sum);
+    const p = document.createElement('span');
+    p.className = 'pc';
+    p.textContent = pc + '%';
+    a.appendChild(p);
+    top.append(n, a);
+
+    const bar = document.createElement('div');
+    bar.className = 'bar';
+    const fill = document.createElement('div');
+    fill.style.width = pc + '%';
+    fill.style.background = COLORS[i % COLORS.length];
+    bar.appendChild(fill);
+
+    row.append(top, bar);
+    box.appendChild(row);
+  });
+}
+
+document.getElementById('prevMonth').addEventListener('click', () => {
+  statsMonth.setMonth(statsMonth.getMonth() - 1);
+  renderStats();
+});
+document.getElementById('nextMonth').addEventListener('click', () => {
+  statsMonth.setMonth(statsMonth.getMonth() + 1);
+  renderStats();
+});
+
+/* month picker */
+const picker = document.getElementById('picker');
+let pickerYear = new Date().getFullYear();
+
+function renderPicker() {
+  const now = new Date();
+  document.getElementById('yearLabel').textContent = pickerYear;
+  document.getElementById('nextYear').disabled = pickerYear >= now.getFullYear();
+
+  const used = new Set(load().map(e => e.date.slice(0, 7)));
+  const grid = document.getElementById('monthGrid');
+  grid.innerHTML = '';
+
+  for (let m = 0; m < 12; m++) {
+    const d = new Date(pickerYear, m, 1);
+    const key = monthKey(d);
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'month-cell';
+    b.textContent = monthName(d);
+    b.disabled = d > now; // no future months
+    b.setAttribute('aria-label',
+      `${monthName(d, true)} ${pickerYear}` + (used.has(key) ? ', has expenses' : ''));
+    if (key === monthKey(statsMonth)) b.classList.add('selected');
+    if (used.has(key)) b.classList.add('has-data');
+    b.addEventListener('click', () => {
+      statsMonth = new Date(pickerYear, m, 1);
+      closePicker();
+      renderStats();
+    });
+    grid.appendChild(b);
+  }
+}
+
+function openPicker() {
+  pickerYear = statsMonth.getFullYear();
+  renderPicker();
+  picker.classList.add('open');
+}
+function closePicker() {
+  picker.classList.remove('open');
+}
+
+document.getElementById('monthLabel').addEventListener('click', openPicker);
+document.getElementById('pickerClose').addEventListener('click', closePicker);
+document.getElementById('pickerBackdrop').addEventListener('click', closePicker);
+document.getElementById('prevYear').addEventListener('click', () => { pickerYear--; renderPicker(); });
+document.getElementById('nextYear').addEventListener('click', () => { pickerYear++; renderPicker(); });
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && picker.classList.contains('open')) closePicker();
+});
 
 /* tabs */
 document.querySelectorAll('.tab').forEach(btn => {

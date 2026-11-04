@@ -25,10 +25,32 @@
       <ul id="list"></ul>
     </section>
 
-    <section id="stats" class="screen">
-      <h1>Stats</h1>
-      <p class="empty">Coming in the next step.</p>
-    </section>
+<section id="stats" class="screen">
+  <h1>Stats</h1>
+
+  <div class="month-switch">
+    <button id="prevMonth" aria-label="Previous month">‹</button>
+    <button id="monthLabel" class="month-btn" aria-haspopup="dialog"></button>    <button id="nextMonth" aria-label="Next month">›</button>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat dark">
+      <div class="stat-label">Daily average</div>
+      <div id="avgVal" class="stat-val">₱0</div>
+    </div>
+    <div class="stat light">
+      <div class="stat-label">Total spent</div>
+      <div id="totalVal" class="stat-val">₱0</div>
+      <div id="pctBadge" class="badge"></div>
+    </div>
+  </div>
+  <p id="compareNote" class="note"></p>
+
+  <div class="stat-card">
+    <h2>By category</h2>
+    <div id="catList"></div>
+  </div>
+</section>
 
     <section id="categories" class="screen">
       <h1>Categories</h1>
@@ -87,6 +109,19 @@
         <button class="danger" id="confirmYes">Delete</button>
         <button class="ghost" id="confirmNo">Keep it</button>
     </div>
+</div>
+
+<div id="picker" class="sheet" role="dialog" aria-modal="true" aria-label="Pick a month">
+  <div class="backdrop" id="pickerBackdrop"></div>
+  <div class="panel">
+    <div class="year-row">
+      <button id="prevYear" aria-label="Previous year">‹</button>
+      <h2 id="yearLabel"></h2>
+      <button id="nextYear" aria-label="Next year">›</button>
+    </div>
+    <div id="monthGrid" class="month-grid"></div>
+    <button class="soft" id="pickerClose">Close</button>
+  </div>
 </div>
 
   <script src="app.js"></script>
