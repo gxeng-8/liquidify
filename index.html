@@ -61,7 +61,7 @@
   <div id="sheet" class="sheet">
     <div class="backdrop" id="backdrop"></div>
     <div class="panel">
-      <h2>New expense</h2>
+      <h2 id="sheetTitle">New expenses</h2>
       <div class="hero">
         <label for="amount" class="hero-label">Amount</label>
         <div class="amount-row">
@@ -73,10 +73,21 @@
       <input id="item" type="text" placeholder="e.g. Lunch">
       <label for="category">Category</label>
       <input id="category" type="text" placeholder="e.g. Food">
+      <div id="suggestions" class="chips"></div>
       <button class="primary" id="saveBtn">Save expense</button>
       <button class="ghost" id="cancelBtn">Cancel</button>
     </div>
   </div>
+
+    <div id="confirm" class="confirm" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <div class="confirm-backdrop"></div>
+    <div class="confirm-box">
+        <h2 id="confirmTitle">Delete this expense?</h2>
+        <p id="confirmText"></p>
+        <button class="danger" id="confirmYes">Delete</button>
+        <button class="ghost" id="confirmNo">Keep it</button>
+    </div>
+</div>
 
   <script src="app.js"></script>
 </body>
