@@ -588,3 +588,21 @@ li.swipe {
   font-size: 13px;
 }
 #balNote { margin: 0 2px 14px; }
+
+/* Today: header stays put, only the list scrolls */
+#today.active {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  padding-bottom: calc(68px + env(safe-area-inset-bottom));
+}
+.today-top { flex: none; }
+.today-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 80px; /* so the last entry clears the + button */
+}

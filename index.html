@@ -16,29 +16,34 @@
 <body>
   <div id="app">
 
-    <section id="today" class="screen active">
-    <div class="day-nav">
-      <button id="prevDay" aria-label="Previous day">‹</button>
-      <h1 id="listDate"></h1>
-      <button id="nextDay" aria-label="Next day">›</button>
-    </div>
-    <button class="soft today-btn" id="todayBtn" hidden>Back to today</button>   
-      <div class="balance">
-    <div>
-      <div class="bal-label">Total money now</div>
-      <div id="balVal" class="bal-val">—</div>
-    </div>
-    <button class="soft" id="balBtn">Set starting balance</button>
-  </div>
-  <p id="balNote" class="note"></p>   
-    <div class="hero">
-        <div class="hero-label">Spent today</div>
+  <section id="today" class="screen active">
+    <div class="today-top">
+      <div class="day-nav">
+        <button id="prevDay" aria-label="Previous day">‹</button>
+        <h1 id="listDate"></h1>
+        <button id="nextDay" aria-label="Next day">›</button>
+      </div>
+      <button class="soft today-btn" id="todayBtn" hidden>Back to today</button>
+      <div class="hero">
+        <div class="hero-label" id="heroLabel">Spent today</div>
         <div id="dayTotal" class="hero-total">₱0</div>
         <div id="inToday"></div>
       </div>
+    </div>
+
+    <div class="today-scroll">
+      <div class="balance">
+        <div>
+          <div class="bal-label">Total money now</div>
+          <div id="balVal" class="bal-val">—</div>
+        </div>
+        <button class="soft" id="balBtn">Set starting balance</button>
+      </div>
+      <p id="balNote" class="note"></p>
       <h2>Entries</h2>
       <ul id="list"></ul>
-    </section>
+    </div>
+  </section>
 
 <section id="stats" class="screen">
   <h1>Stats</h1>
