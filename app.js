@@ -280,8 +280,9 @@ function renderStats() {
     statsMonth.toLocaleDateString('en-PH', { month: 'long', year: 'numeric' });
   document.getElementById('nextMonth').disabled = isCurrent;
 
-  const entries = load().filter(e => e.date.startsWith(key));
-  const total = entries.reduce((s, e) => s + e.amount, 0);
+  const monthAll = load().filter(e => e.date.startsWith(key));
+  const entries = monthAll.filter(e => e.type !== 'in');
+  const moneyIn = monthAll.filter(e => e.type === 'in').reduce((s, e) => s + e.amount, 0);  const total = entries.reduce((s, e) => s + e.amount, 0);
 
   const daysInMonth = new Date(statsMonth.getFullYear(), statsMonth.getMonth() + 1, 0).getDate();
   const days = isCurrent ? now.getDate() : daysInMonth;
@@ -289,12 +290,19 @@ function renderStats() {
   document.getElementById('totalVal').textContent = peso(total);
   document.getElementById('avgVal').textContent = peso(Math.round(total / days));
 
+  document.getElementById('inVal').textContent = peso(moneyIn);
+  const net = moneyIn - total;
+  document.getElementById('netNote').textContent = !moneyIn
+    ? 'No money in logged this month.'
+    : net >= 0
+      ? `${peso(net)} left after spending.`
+      : `You spent ${peso(-net)} more than your money in.`;
+
   // compare with last month (same number of days if this month isn't over yet)
   const prev = new Date(statsMonth.getFullYear(), statsMonth.getMonth() - 1, 1);
   const prevKey = monthKey(prev);
   const prevTotal = load()
-    .filter(e => e.date.startsWith(prevKey) && (!isCurrent || parseInt(e.date.slice(8), 10) <= days))
-    .reduce((s, e) => s + e.amount, 0);
+    .filter(e => e.type !== 'in' && e.date.startsWith(prevKey) && (!isCurrent || parseInt(e.date.slice(8), 10) <= days))    .reduce((s, e) => s + e.amount, 0);
 
   const badge = document.getElementById('pctBadge');
   const note = document.getElementById('compareNote');
@@ -467,8 +475,8 @@ function validEntry(e) {
     && typeof e.item === 'string' && e.item.trim()
     && typeof e.amount === 'number' && isFinite(e.amount) && e.amount > 0
     && typeof e.category === 'string' && e.category.trim()
-    && typeof e.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.date);
-}
+    && typeof e.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.date)
+    && (e.type === undefined || e.type === 'in' || e.type === 'out');}
 
 async function importBackup(file) {
   const msg = document.getElementById('backupMsg');
@@ -485,8 +493,7 @@ async function importBackup(file) {
     good.forEach(e => {
       if (!have.has(e.id)) {
         list.push({ id: e.id, item: e.item.trim(), amount: e.amount,
-                    category: e.category.trim(), date: e.date });
-        have.add(e.id);
+          category: e.category.trim(), type: e.type === 'in' ? 'in' : 'out', date: e.date });        have.add(e.id);
         added++;
       }
     });

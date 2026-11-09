@@ -499,3 +499,5 @@ li.swipe {
 .price.in { color: #0B6B4E; }
 #inToday { margin-top: 4px; font-size: 13px; font-weight: 700; color: #0B6B4E; }
 #inToday:empty { display: none; }
+
+.in-val { font-size: 24px; font-weight: 800; color: #0B6B4E; }
