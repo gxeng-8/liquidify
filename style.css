@@ -563,3 +563,28 @@ li.swipe {
   font-weight: 700;
   color: var(--muted);
 }
+
+/* total money card */
+.balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--navy);
+  color: #fff;
+  border-radius: 22px;
+  padding: 16px 18px;
+  margin-bottom: 6px;
+}
+.bal-label { font-size: 12px; color: #BFE3EE; }
+.bal-val { font-size: 26px; font-weight: 800; }
+.bal-val.neg { color: #FFD98A; }
+.balance .soft {
+  width: auto;
+  flex: none;
+  margin: 0;
+  padding: 0 14px;
+  height: 44px;
+  font-size: 13px;
+}
+#balNote { margin: 0 2px 14px; }

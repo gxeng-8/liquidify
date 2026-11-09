@@ -165,10 +165,48 @@ document.getElementById('todayBtn').addEventListener('click', () => {
   render();
 });
 
+/* total money */
+function isStart(e) {
+  return e.type === 'in' && normalize(e.category) === 'balance';
+}
+
+function renderBalance() {
+  const all = load();
+  const starts = all.filter(isStart)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+  const s = starts[starts.length - 1]; // latest balance entry wins
+
+  const val = document.getElementById('balVal');
+  const note = document.getElementById('balNote');
+  const btn = document.getElementById('balBtn');
+
+  if (!s) {
+    val.textContent = '—';
+    val.classList.remove('neg');
+    note.textContent = 'Add how much money you have right now to start tracking.';
+    btn.textContent = 'Set starting balance';
+    return;
+  }
+
+  // only entries logged after the balance entry count
+  const after = all.filter(e => e.id !== s.id &&
+    (e.date > s.date || (e.date === s.date && e.id > s.id)));
+  const bal = s.amount +
+    after.reduce((sum, e) => sum + (e.type === 'in' ? e.amount : -e.amount), 0);
+
+  val.textContent = (bal < 0 ? '−' : '') + peso(Math.abs(bal));
+  val.classList.toggle('neg', bal < 0);
+  note.textContent = 'Since ' +
+    dateFromKey(s.date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric' }) +
+    ': balance plus money in, minus spending.';
+  btn.textContent = 'Update balance';
+}
+
 /* today / day list */
 function render() {
   renderStats();
   renderSearch();
+  renderBalance();
 
   const items = load().filter(e => e.date === viewKey());
   const today = isViewToday();
@@ -180,8 +218,7 @@ function render() {
   document.getElementById('todayBtn').hidden = today;
 
   const total = items.filter(e => e.type !== 'in').reduce((sum, e) => sum + e.amount, 0);
-  const moneyIn = items.filter(e => e.type === 'in').reduce((sum, e) => sum + e.amount, 0);
-  document.getElementById('dayTotal').textContent = peso(total);
+  const moneyIn = items.filter(e => e.type === 'in' && !isStart(e)).reduce((sum, e) => sum + e.amount, 0);  document.getElementById('dayTotal').textContent = peso(total);
   document.getElementById('inToday').textContent =
     moneyIn ? `+${peso(moneyIn)} money in ${today ? 'today' : 'this day'}` : '';
 
@@ -263,8 +300,7 @@ function renderStats() {
 
   const monthAll = load().filter(e => e.date.startsWith(key));
   const entries = monthAll.filter(e => e.type !== 'in');
-  const moneyIn = monthAll.filter(e => e.type === 'in').reduce((s, e) => s + e.amount, 0);
-  const total = entries.reduce((s, e) => s + e.amount, 0);
+  const moneyIn = monthAll.filter(e => e.type === 'in' && !isStart(e)).reduce((s, e) => s + e.amount, 0);  const total = entries.reduce((s, e) => s + e.amount, 0);
 
   const daysInMonth = new Date(statsMonth.getFullYear(), statsMonth.getMonth() + 1, 0).getDate();
   const days = isCurrent ? now.getDate() : daysInMonth;
@@ -703,6 +739,15 @@ function closeSheet() {
   itemEl.value = '';
   categoryEl.value = '';
 }
+
+function openStart() {
+  openSheet();
+  setType('in');
+  itemEl.value = 'Starting balance';
+  categoryEl.value = 'Balance';
+  renderSuggestions();
+}
+document.getElementById('balBtn').addEventListener('click', openStart);
 
 document.getElementById('addBtn').addEventListener('click', () => openSheet());
 document.getElementById('cancelBtn').addEventListener('click', closeSheet);
