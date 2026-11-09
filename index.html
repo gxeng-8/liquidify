@@ -64,10 +64,13 @@
   </div>
 </section>
 
-    <section id="categories" class="screen">
-      <h1>Categories</h1>
-      <p class="empty">Coming soon.</p>
-    </section>
+  <section id="search" class="screen">
+    <h1>Search</h1>
+    <label for="q" class="sr-only">Search your entries</label>
+    <input id="q" type="search" placeholder="Name, category, amount, date" autocomplete="off">
+    <p id="searchSummary" class="note" role="status"></p>
+    <ul id="searchList"></ul>
+  </section>
 
     <section id="you" class="screen">
     <h1>You</h1>
@@ -91,8 +94,8 @@
     <button class="tab" data-screen="stats">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>Stats
     </button>
-    <button class="tab" data-screen="categories">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Categories
+    <button class="tab" data-screen="search">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 18a7 7 0 100-14 7 7 0 000 14zM21 21l-4.35-4.35"/></svg>Search
     </button>
     <button class="tab" data-screen="you">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6"/></svg>You

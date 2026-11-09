@@ -530,3 +530,36 @@ li.swipe {
 .day-nav button:disabled { opacity: .35; }
 .today-btn { margin: -6px 0 14px; }
 .today-btn[hidden] { display: none; }
+
+/* search */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+#q {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #CFE3EA;
+  border-radius: 26px;
+  padding: 0 20px;
+  font-size: 16px; /* 16px stops iPhone from zooming in */
+  font-family: inherit;
+  color: var(--navy);
+  background: #fff;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+#q:focus { box-shadow: 0 0 0 3px #A9D8E8; }
+#searchList .day-head {
+  min-height: 0;
+  padding: 16px 0 4px;
+  border: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}

@@ -168,6 +168,7 @@ document.getElementById('todayBtn').addEventListener('click', () => {
 /* today / day list */
 function render() {
   renderStats();
+  renderSearch();
 
   const items = load().filter(e => e.date === viewKey());
   const today = isViewToday();
@@ -511,6 +512,85 @@ document.getElementById('importFile').addEventListener('change', ev => {
   if (f) importBackup(f);
   ev.target.value = ''; // so you can pick the same file again
 });
+
+/* search */
+const qEl = document.getElementById('q');
+
+function dateFromKey(k) {
+  const [y, m, d] = k.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function renderSearch() {
+  const list = document.getElementById('searchList');
+  const sum = document.getElementById('searchSummary');
+  list.innerHTML = '';
+
+  const raw = qEl.value.trim();
+  const q = raw.toLowerCase();
+  if (!q) {
+    sum.textContent = 'Type a name, category, amount, or date (like "nov 3").';
+    return;
+  }
+
+  const results = load()
+    .filter(e => {
+      const label = dateFromKey(e.date).toLocaleDateString('en-PH',
+        { month: 'short', day: 'numeric', year: 'numeric' });
+      return `${e.item} ${e.category} ${label} ${e.amount}`.toLowerCase().includes(q);
+    })
+    .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+
+  if (!results.length) {
+    sum.textContent = `No results for "${raw}".`;
+    return;
+  }
+
+  const spent = results.filter(e => e.type !== 'in').reduce((s, e) => s + e.amount, 0);
+  const moneyIn = results.filter(e => e.type === 'in').reduce((s, e) => s + e.amount, 0);
+  const shown = results.slice(0, 100);
+
+  sum.textContent =
+    `${results.length} result${results.length > 1 ? 's' : ''} · Spent ${peso(spent)}` +
+    (moneyIn ? ` · Money in ${peso(moneyIn)}` : '') +
+    (results.length > shown.length ? ' · showing the first 100' : '');
+
+  let last = '';
+  shown.forEach(e => {
+    if (e.date !== last) {
+      last = e.date;
+      const h = document.createElement('li');
+      h.className = 'day-head';
+      h.textContent = dateFromKey(e.date).toLocaleDateString('en-PH',
+        { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      list.appendChild(h);
+    }
+
+    const li = document.createElement('li');
+    const row = document.createElement('button');
+    row.className = 'row';
+    row.addEventListener('click', () => openSheet(e));
+
+    const left = document.createElement('span');
+    const name = document.createElement('span');
+    name.className = 'name';
+    name.textContent = e.item;
+    const cat = document.createElement('span');
+    cat.className = 'cat';
+    cat.textContent = e.category;
+    left.append(name, cat);
+
+    const price = document.createElement('span');
+    price.className = 'price' + (e.type === 'in' ? ' in' : '');
+    price.textContent = (e.type === 'in' ? '+' : '') + peso(e.amount);
+
+    row.append(left, price);
+    li.appendChild(row);
+    list.appendChild(li);
+  });
+}
+
+qEl.addEventListener('input', renderSearch);
 
 /* tabs */
 document.querySelectorAll('.tab').forEach(btn => {
