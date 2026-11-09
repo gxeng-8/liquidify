@@ -10,7 +10,7 @@
   <title>Money Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
   <link rel="apple-touch-icon" href="icon.png">
 </head>
 <body>
@@ -21,6 +21,7 @@
       <div class="hero">
         <div class="hero-label">Spent today</div>
         <div id="dayTotal" class="hero-total">₱0</div>
+        <div id="inToday"></div>
       </div>
       <h2>Entries</h2>
       <ul id="list"></ul>
@@ -92,6 +93,10 @@
     <div class="backdrop" id="backdrop"></div>
     <div class="panel">
       <h2 id="sheetTitle">New expenses</h2>
+      <div class="seg" id="typeSeg" role="group" aria-label="Entry type">
+        <button type="button" class="seg-btn active" data-type="out" aria-pressed="true">Expense</button>
+        <button type="button" class="seg-btn" data-type="in" aria-pressed="false">Money in</button>
+      </div>
       <div class="hero">
         <label for="amount" class="hero-label">Amount</label>
         <div class="amount-row">
@@ -99,9 +104,9 @@
           <input id="amount" type="number" inputmode="decimal" placeholder="0">
         </div>
       </div>
-      <label for="item">What was it for?</label>
+      <label for="item" id="itemLabel">What was it for?</label>
       <input id="item" type="text" placeholder="e.g. Lunch">
-      <label for="category">Category</label>
+      <label for="category" id="catLabel">Category</label>
       <input id="category" type="text" placeholder="e.g. Food">
       <div id="suggestions" class="chips"></div>
       <button class="primary" id="saveBtn">Save expense</button>
@@ -132,6 +137,6 @@
   </div>
 </div>
 
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>

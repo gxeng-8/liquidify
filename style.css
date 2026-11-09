@@ -472,3 +472,30 @@ li.swipe {
 
 /* soft highlight on the whole card instead */
 .hero:focus-within { box-shadow: 0 0 0 3px #A9D8E8; }
+
+/* expense / money in toggle */
+.seg {
+  display: flex;
+  gap: 6px;
+  background: var(--sky);
+  border-radius: 24px;
+  padding: 4px;
+  margin-bottom: 12px;
+}
+.seg[hidden] { display: none; }
+.seg-btn {
+  flex: 1;
+  height: 44px;
+  border: 0;
+  border-radius: 20px;
+  background: none;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+}
+.seg-btn.active { background: #fff; color: var(--navy); box-shadow: 0 1px 4px rgba(18, 50, 74, .15); }
+
+.price.in { color: #0B6B4E; }
+#inToday { margin-top: 4px; font-size: 13px; font-weight: 700; color: #0B6B4E; }
+#inToday:empty { display: none; }

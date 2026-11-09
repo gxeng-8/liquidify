@@ -201,8 +201,10 @@ function render() {
   document.getElementById('listDate').textContent =
     new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  const total = items.reduce((sum, e) => sum + e.amount, 0);
+  const total = items.filter(e => e.type !== 'in').reduce((sum, e) => sum + e.amount, 0);
+  const moneyIn = items.filter(e => e.type === 'in').reduce((sum, e) => sum + e.amount, 0);
   document.getElementById('dayTotal').textContent = peso(total);
+  document.getElementById('inToday').textContent = moneyIn ? `+${peso(moneyIn)} money in today` : '';
 
   const ul = document.getElementById('list');
   ul.innerHTML = '';
@@ -247,8 +249,8 @@ function render() {
     left.append(name, cat);
 
     const price = document.createElement('span');
-    price.className = 'price';
-    price.textContent = peso(e.amount);
+    price.className = 'price' + (e.type === 'in' ? ' in' : '');
+    price.textContent = (e.type === 'in' ? '+' : '') + peso(e.amount);
 
     row.append(left, price);
     slide.appendChild(row);
@@ -533,7 +535,7 @@ function normalize(s) {
 
 function getCategories() {
   const map = new Map();
-  load().forEach(e => {
+  load().filter(e => (e.type || 'out') === entryType).forEach(e => {
     map.set(normalize(e.category), { name: e.category, last: e.id });
   });
   return [...map.values()].sort((a, b) => b.last - a.last);
@@ -571,14 +573,37 @@ function renderSuggestions() {
 categoryEl.addEventListener('input', renderSuggestions);
 
 let editingId = null;
+let entryType = 'out';
+
+function setType(t) {
+  entryType = t;
+  const isIn = t === 'in';
+  document.querySelectorAll('.seg-btn').forEach(b => {
+    const on = b.dataset.type === t;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on);
+  });
+  document.getElementById('sheetTitle').textContent =
+    (editingId ? 'Edit ' : 'New ') + (isIn ? 'money in' : 'expense');
+  document.getElementById('saveBtn').textContent =
+    editingId ? 'Save changes' : (isIn ? 'Save money in' : 'Save expense');
+  document.getElementById('itemLabel').textContent = isIn ? 'From who?' : 'What was it for?';
+  document.getElementById('catLabel').textContent = isIn ? 'Type' : 'Category';
+  itemEl.placeholder = isIn ? 'e.g. Mom' : 'e.g. Lunch';
+  categoryEl.placeholder = isIn ? 'e.g. Allowance, Gift' : 'e.g. Food';
+  renderSuggestions();
+}
+
+document.querySelectorAll('.seg-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    categoryEl.value = '';
+    setType(b.dataset.type);
+  });
+});
 
 function openSheet(entry) {
   editingId = entry ? entry.id : null;
-
-  document.getElementById('sheetTitle').textContent =
-    entry ? 'Edit expense' : 'New expense';
-  document.getElementById('saveBtn').textContent =
-    entry ? 'Save changes' : 'Save expense';
+  document.getElementById('typeSeg').hidden = !!entry; // can't switch type while editing
 
   if (entry) {
     amountEl.value = entry.amount;
@@ -586,7 +611,7 @@ function openSheet(entry) {
     categoryEl.value = entry.category;
   }
 
-  renderSuggestions();
+  setType(entry ? (entry.type || 'out') : 'out');
   sheet.classList.add('open');
   setTimeout(() => amountEl.focus(), 250);
 }
@@ -623,10 +648,10 @@ document.getElementById('saveBtn').addEventListener('click', () => {
       entry.item = item;
       entry.amount = amount;
       entry.category = category;
+      entry.type = entryType;
     }
   } else {
-    list.push({ id: Date.now(), item, amount, category, date: dateKey() });
-  }
+    list.push({ id: Date.now(), item, amount, category, type: entryType, date: dateKey() });  }
   save(list);
 
   closeSheet();
