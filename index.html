@@ -10,15 +10,19 @@
   <title>Money Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=10">
   <link rel="apple-touch-icon" href="icon.png">
 </head>
 <body>
   <div id="app">
 
     <section id="today" class="screen active">
+    <div class="day-nav">
+      <button id="prevDay" aria-label="Previous day">‹</button>
       <h1 id="listDate"></h1>
-      <div class="hero">
+      <button id="nextDay" aria-label="Next day">›</button>
+    </div>
+    <button class="soft today-btn" id="todayBtn" hidden>Back to today</button>      <div class="hero">
         <div class="hero-label">Spent today</div>
         <div id="dayTotal" class="hero-total">₱0</div>
         <div id="inToday"></div>
@@ -104,8 +108,7 @@
         <button type="button" class="seg-btn" data-type="in" aria-pressed="false">Money in</button>
       </div>
       <div class="hero">
-        <label for="amount" class="hero-label">Amount</label>
-        <div class="amount-row">
+      <div class="hero-label" id="heroLabel">Spent today</div>        <div class="amount-row">
           <span>₱</span>
           <input id="amount" type="number" inputmode="decimal" placeholder="0">
         </div>
@@ -143,6 +146,6 @@
   </div>
 </div>
 
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

@@ -501,3 +501,32 @@ li.swipe {
 #inToday:empty { display: none; }
 
 .in-val { font-size: 24px; font-weight: 800; color: #0B6B4E; }
+
+/* day navigation */
+.day-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.day-nav h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 19px;
+  text-align: center;
+}
+.day-nav button {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border: 0;
+  border-radius: 22px;
+  background: var(--sky);
+  color: var(--navy);
+  font-size: 22px;
+  font-family: inherit;
+}
+.day-nav button:disabled { opacity: .35; }
+.today-btn { margin: -6px 0 14px; }
+.today-btn[hidden] { display: none; }

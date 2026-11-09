@@ -21,56 +21,6 @@ function peso(n) {
   return '₱' + n.toLocaleString('en-PH');
 }
 
-function addSwipe(slide) {
-  const W = 88; // width of the Delete button
-  let startX = 0, dx = 0, base = 0, dragging = false, moved = false;
-
-  slide.addEventListener('pointerdown', ev => {
-    if (openSlide && openSlide !== slide) closeOpen();
-    startX = ev.clientX;
-    base = slide === openSlide ? -W : 0;
-    dx = 0;
-    moved = false;
-    dragging = true;
-    slide.style.transition = 'none';
-  });
-
-  slide.addEventListener('pointermove', ev => {
-    if (!dragging) return;
-    dx = ev.clientX - startX;
-    if (Math.abs(dx) > 8) moved = true;
-    const x = Math.min(0, Math.max(-W, base + dx));
-    slide.style.transform = `translateX(${x}px)`;
-  });
-
-  function end() {
-    if (!dragging) return;
-    dragging = false;
-    slide.style.transition = '';
-    if (base + dx < -W / 2) {
-      slide.style.transform = `translateX(-${W}px)`;
-      openSlide = slide;
-    } else {
-      slide.style.transform = '';
-      if (openSlide === slide) openSlide = null;
-    }
-  }
-  slide.addEventListener('pointerup', end);
-  slide.addEventListener('pointercancel', end);
-
-  // a swipe shouldn't count as a tap; tapping an open row just closes it
-  slide.addEventListener('click', ev => {
-    if (moved) {
-      ev.stopPropagation();
-      ev.preventDefault();
-      moved = false;
-    } else if (slide === openSlide) {
-      ev.stopPropagation();
-      closeOpen();
-    }
-  }, true);
-}
-
 /* delete popup */
 const confirmEl = document.getElementById('confirm');
 let onYes = null;
@@ -194,17 +144,45 @@ function addSwipe(li, slide, entry) {
   }, true);
 }
 
+/* which day the Today screen shows */
+let viewDate = new Date();
+
+function viewKey() { return dateKey(viewDate); }
+function isViewToday() { return viewKey() === dateKey(); }
+
+function shiftDay(n) {
+  const d = new Date(viewDate);
+  d.setDate(d.getDate() + n);
+  if (d > new Date()) return; // no future days
+  viewDate = d;
+  render();
+}
+
+document.getElementById('prevDay').addEventListener('click', () => shiftDay(-1));
+document.getElementById('nextDay').addEventListener('click', () => shiftDay(1));
+document.getElementById('todayBtn').addEventListener('click', () => {
+  viewDate = new Date();
+  render();
+});
+
+/* today / day list */
 function render() {
   renderStats();
-  const items = load().filter(e => e.date === dateKey());
+
+  const items = load().filter(e => e.date === viewKey());
+  const today = isViewToday();
 
   document.getElementById('listDate').textContent =
-    new Date().toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
+    viewDate.toLocaleDateString('en-PH', { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('heroLabel').textContent = today ? 'Spent today' : 'Spent this day';
+  document.getElementById('nextDay').disabled = today;
+  document.getElementById('todayBtn').hidden = today;
 
   const total = items.filter(e => e.type !== 'in').reduce((sum, e) => sum + e.amount, 0);
   const moneyIn = items.filter(e => e.type === 'in').reduce((sum, e) => sum + e.amount, 0);
   document.getElementById('dayTotal').textContent = peso(total);
-  document.getElementById('inToday').textContent = moneyIn ? `+${peso(moneyIn)} money in today` : '';
+  document.getElementById('inToday').textContent =
+    moneyIn ? `+${peso(moneyIn)} money in ${today ? 'today' : 'this day'}` : '';
 
   const ul = document.getElementById('list');
   ul.innerHTML = '';
@@ -212,7 +190,9 @@ function render() {
   if (!items.length) {
     const li = document.createElement('li');
     li.className = 'empty';
-    li.textContent = 'No expenses yet today. Tap + to add one.';
+    li.textContent = today
+      ? 'No expenses yet today. Tap + to add one.'
+      : 'Nothing logged on this day. Tap + to add one.';
     ul.appendChild(li);
     return;
   }
@@ -282,7 +262,8 @@ function renderStats() {
 
   const monthAll = load().filter(e => e.date.startsWith(key));
   const entries = monthAll.filter(e => e.type !== 'in');
-  const moneyIn = monthAll.filter(e => e.type === 'in').reduce((s, e) => s + e.amount, 0);  const total = entries.reduce((s, e) => s + e.amount, 0);
+  const moneyIn = monthAll.filter(e => e.type === 'in').reduce((s, e) => s + e.amount, 0);
+  const total = entries.reduce((s, e) => s + e.amount, 0);
 
   const daysInMonth = new Date(statsMonth.getFullYear(), statsMonth.getMonth() + 1, 0).getDate();
   const days = isCurrent ? now.getDate() : daysInMonth;
@@ -302,7 +283,10 @@ function renderStats() {
   const prev = new Date(statsMonth.getFullYear(), statsMonth.getMonth() - 1, 1);
   const prevKey = monthKey(prev);
   const prevTotal = load()
-    .filter(e => e.type !== 'in' && e.date.startsWith(prevKey) && (!isCurrent || parseInt(e.date.slice(8), 10) <= days))    .reduce((s, e) => s + e.amount, 0);
+    .filter(e => e.type !== 'in'
+      && e.date.startsWith(prevKey)
+      && (!isCurrent || parseInt(e.date.slice(8), 10) <= days))
+    .reduce((s, e) => s + e.amount, 0);
 
   const badge = document.getElementById('pctBadge');
   const note = document.getElementById('compareNote');
@@ -429,6 +413,7 @@ document.addEventListener('keydown', ev => {
   if (ev.key === 'Escape' && picker.classList.contains('open')) closePicker();
 });
 
+/* backup */
 async function exportBackup() {
   const msg = document.getElementById('backupMsg');
   msg.textContent = 'Preparing your backup...';
@@ -476,7 +461,8 @@ function validEntry(e) {
     && typeof e.amount === 'number' && isFinite(e.amount) && e.amount > 0
     && typeof e.category === 'string' && e.category.trim()
     && typeof e.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(e.date)
-    && (e.type === undefined || e.type === 'in' || e.type === 'out');}
+    && (e.type === undefined || e.type === 'in' || e.type === 'out');
+}
 
 async function importBackup(file) {
   const msg = document.getElementById('backupMsg');
@@ -492,8 +478,15 @@ async function importBackup(file) {
     let added = 0;
     good.forEach(e => {
       if (!have.has(e.id)) {
-        list.push({ id: e.id, item: e.item.trim(), amount: e.amount,
-          category: e.category.trim(), type: e.type === 'in' ? 'in' : 'out', date: e.date });        have.add(e.id);
+        list.push({
+          id: e.id,
+          item: e.item.trim(),
+          amount: e.amount,
+          category: e.category.trim(),
+          type: e.type === 'in' ? 'in' : 'out',
+          date: e.date
+        });
+        have.add(e.id);
         added++;
       }
     });
@@ -529,11 +522,14 @@ document.querySelectorAll('.tab').forEach(btn => {
   });
 });
 
-/* add sheet */
+/* add / edit sheet */
 const sheet = document.getElementById('sheet');
 const amountEl = document.getElementById('amount');
 const itemEl = document.getElementById('item');
 const categoryEl = document.getElementById('category');
+
+let editingId = null;
+let entryType = 'out';
 
 /* category helpers */
 function normalize(s) {
@@ -578,9 +574,6 @@ function renderSuggestions() {
 }
 
 categoryEl.addEventListener('input', renderSuggestions);
-
-let editingId = null;
-let entryType = 'out';
 
 function setType(t) {
   entryType = t;
@@ -631,7 +624,8 @@ function closeSheet() {
   categoryEl.value = '';
 }
 
-document.getElementById('addBtn').addEventListener('click', () => openSheet());document.getElementById('cancelBtn').addEventListener('click', closeSheet);
+document.getElementById('addBtn').addEventListener('click', () => openSheet());
+document.getElementById('cancelBtn').addEventListener('click', closeSheet);
 document.getElementById('backdrop').addEventListener('click', closeSheet);
 
 document.getElementById('saveBtn').addEventListener('click', () => {
@@ -658,7 +652,8 @@ document.getElementById('saveBtn').addEventListener('click', () => {
       entry.type = entryType;
     }
   } else {
-    list.push({ id: Date.now(), item, amount, category, type: entryType, date: dateKey() });  }
+    list.push({ id: Date.now(), item, amount, category, type: entryType, date: viewKey() });
+  }
   save(list);
 
   closeSheet();
